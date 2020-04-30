@@ -30,13 +30,18 @@
 
 namespace bthread {
 
-DEFINE_int32(bthread_concurrency, 8 + BTHREAD_EPOLL_THREAD_NUM,
+// NOTE(zhijunfu): reduce pthread count from 8 + 1 to 1 + 1.
+DEFINE_int32(bthread_concurrency, 1 + BTHREAD_EPOLL_THREAD_NUM,
              "Number of pthread workers");
 
 DEFINE_int32(bthread_min_concurrency, 0,
             "Initial number of pthread workers which will be added on-demand."
             " The laziness is disabled when this value is non-positive,"
             " and workers will be created eagerly according to -bthread_concurrency and bthread_setconcurrency(). ");
+
+DEFINE_int32(bthread_in_place_execution, false,
+             "If this is true, execution_queue_execute would call execute immediately"
+             " instead of starting a bthread if possible");
 
 static bool never_set_bthread_concurrency = true;
 
@@ -311,6 +316,14 @@ int bthread_setconcurrency(int num) {
         return 0;
     }
     return (num == bthread::FLAGS_bthread_concurrency ? 0 : EPERM);
+}
+
+bool bthread_get_in_place_execution() {
+    return bthread::FLAGS_bthread_in_place_execution;
+}
+
+void bthread_set_in_place_execution(bool in_place) {
+   bthread::FLAGS_bthread_in_place_execution = in_place; 
 }
 
 int bthread_about_to_quit() {

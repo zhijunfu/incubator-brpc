@@ -155,6 +155,12 @@ extern int bthread_yield(void);
 // Interruptible by bthread_interrupt().
 extern int bthread_usleep(uint64_t microseconds);
 
+// Get `in_place_if_possible` flag for TaskOptions.
+extern bool bthread_get_in_place_execution();
+
+// Set `in_place_if_possible` flag for TaskOptions.
+extern void bthread_set_in_place_execution(bool in_place);
+
 // ---------------------------------------------
 // Functions for mutex handling.
 // ---------------------------------------------

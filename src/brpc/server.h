@@ -240,6 +240,14 @@ struct ServerOptions {
     // Default: NULL (disabled)
     RedisService* redis_service;
 
+    // If |in_place_execution| is true, execution_queue_execute would call 
+    // execute immediately instead of starting a bthread if possible
+    //
+    // Note: Running callbacks in place might cause the dead lock issue, you
+    // should be very careful turning this flag on.
+    //
+    // Default: false
+    bool in_place_execution;
 private:
     // SSLOptions is large and not often used, allocate it on heap to
     // prevent ServerOptions from being bloated in most cases.

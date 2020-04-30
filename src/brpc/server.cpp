@@ -141,7 +141,8 @@ ServerOptions::ServerOptions()
     , http_master_service(NULL)
     , health_reporter(NULL)
     , rtmp_service(NULL)
-    , redis_service(NULL) {
+    , redis_service(NULL)
+    , in_place_execution(false) {
     if (s_ncore > 0) {
         num_threads = s_ncore + 1;
     }
@@ -915,6 +916,8 @@ int Server::StartInternal(const butil::ip_t& ip,
         }
         bthread_setconcurrency(_options.num_threads);
     }
+
+    bthread_set_in_place_execution(_options.in_place_execution);
 
     for (MethodMap::iterator it = _method_map.begin();
         it != _method_map.end(); ++it) {

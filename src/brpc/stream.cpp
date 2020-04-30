@@ -431,7 +431,8 @@ int Stream::OnReceived(const StreamFrameMeta& fm, butil::IOBuf *buf, Socket* soc
         if (!fm.has_continuation()) {
             butil::IOBuf *tmp = _pending_buf;
             _pending_buf = NULL;
-            if (bthread::execution_queue_execute(_consumer_queue, tmp) != 0) {
+            bthread::TaskOptions options(false, bthread_get_in_place_execution());
+            if (bthread::execution_queue_execute(_consumer_queue, tmp, &options) != 0) {
                 CHECK(false) << "Fail to push into channel";
                 delete tmp;
                 Close();

@@ -20,8 +20,8 @@
 #include <gflags/gflags.h>
 #include <butil/logging.h>
 #include <brpc/server.h>
-#include "echo.pb.h"
 #include <brpc/stream.h>
+#include "example/streaming_echo_c++/echo.pb.h"
 
 DEFINE_bool(send_attachment, true, "Carry attachment along with response");
 DEFINE_int32(port, 8001, "TCP Port of this server");
@@ -104,6 +104,7 @@ int main(int argc, char* argv[]) {
     // Start the server. 
     brpc::ServerOptions options;
     options.idle_timeout_sec = FLAGS_idle_timeout_s;
+    options.num_threads = 4;
     if (server.Start(FLAGS_port, &options) != 0) {
         LOG(ERROR) << "Fail to start EchoServer";
         return -1;
