@@ -40,7 +40,6 @@
 #include "brpc/health_reporter.h"
 #include "brpc/adaptive_max_concurrency.h"
 #include "brpc/http2.h"
-#include "brpc/redis.h"
 
 namespace brpc {
 

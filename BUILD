@@ -304,6 +304,7 @@ objc_library(
         "src/butil/threading/thread_restrictions.h",
         "src/butil/threading/thread_id_name_manager.h",
         "src/butil/type_traits.h",
+        "src/butil/third_party/murmurhash3/murmurhash3.h",
     ],
     non_arc_srcs = [
         "src/butil/mac/bundle_locations.mm",
