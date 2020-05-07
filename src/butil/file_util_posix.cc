@@ -22,8 +22,6 @@
 #include <unistd.h>
 
 #if defined(OS_MACOSX)
-#include <AvailabilityMacros.h>
-#include "butil/mac/foundation_util.h"
 #elif !defined(OS_CHROMEOS) && defined(USE_GLIB)
 #include <glib.h>  // for g_get_home_dir()
 #endif
@@ -130,10 +128,6 @@ bool VerifySpecificPathControlledByUser(const FilePath& path,
 }
 
 std::string TempFileName() {
-#if defined(OS_MACOSX)
-  return StringPrintf(".%s.XXXXXX", butil::mac::BaseBundleID());
-#endif
-
 #if defined(GOOGLE_CHROME_BUILD)
   return std::string(".com.google.Chrome.XXXXXX");
 #else
@@ -436,8 +430,6 @@ bool SetPosixFilePermissions(const FilePath& path,
   return true;
 }
 
-#if !defined(OS_MACOSX)
-// This is implemented in file_util_mac.mm for Mac.
 bool GetTempDir(FilePath* path) {
   const char* tmp = getenv("TMPDIR");
   if (tmp) {
@@ -447,7 +439,6 @@ bool GetTempDir(FilePath* path) {
   }
   return true;
 }
-#endif  // !defined(OS_MACOSX)
 
 #if !defined(OS_MACOSX)  // Mac implementation is in file_util_mac.mm.
 FilePath GetHomeDir() {
@@ -878,8 +869,6 @@ bool MoveUnsafe(const FilePath& from_path, const FilePath& to_path) {
   return true;
 }
 
-#if !defined(OS_MACOSX)
-// Mac has its own implementation, this is for all other Posix systems.
 bool CopyFileUnsafe(const FilePath& from_path, const FilePath& to_path) {
   ThreadRestrictions::AssertIOAllowed();
   int infile = HANDLE_EINTR(open(from_path.value().c_str(), O_RDONLY));
@@ -926,7 +915,6 @@ bool CopyFileUnsafe(const FilePath& from_path, const FilePath& to_path) {
 
   return result;
 }
-#endif  // !defined(OS_MACOSX)
 
 }  // namespace internal
 }  // namespace butil

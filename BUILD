@@ -250,6 +250,7 @@ BUTIL_SRCS = [
         ":darwin": [
             "src/butil/time/time_mac.cc",
             "src/butil/mac/scoped_mach_port.cc",
+            "src/butil/strings/sys_string_conversions_posix.cc",
         ],
         "//conditions:default": [
             "src/butil/file_util_linux.cc",
@@ -258,7 +259,7 @@ BUTIL_SRCS = [
         ],
 })
 
-objc_library(
+cc_library(
     name = "macos_lib",
     hdrs = [":config_h",
         "src/butil/atomicops.h",
@@ -272,15 +273,12 @@ objc_library(
         "src/butil/containers/hash_tables.h",
         "src/butil/debug/debugger.h",
         "src/butil/debug/leak_annotations.h",
-        "src/butil/file_util.h",
         "src/butil/file_descriptor_posix.h",
         "src/butil/files/file_path.h",
         "src/butil/files/file.h",
         "src/butil/files/scoped_file.h",
         "src/butil/lazy_instance.h",
         "src/butil/logging.h",
-        "src/butil/mac/bundle_locations.h",
-        "src/butil/mac/foundation_util.h",
         "src/butil/mac/scoped_cftyperef.h",
         "src/butil/mac/scoped_typeref.h",
         "src/butil/macros.h",
@@ -306,12 +304,9 @@ objc_library(
         "src/butil/type_traits.h",
         "src/butil/third_party/murmurhash3/murmurhash3.h",
     ],
-    non_arc_srcs = [
-        "src/butil/mac/bundle_locations.mm",
-        "src/butil/mac/foundation_util.mm",
-        "src/butil/file_util_mac.mm",
-        "src/butil/threading/platform_thread_mac.mm",
-        "src/butil/strings/sys_string_conversions_mac.mm",
+    # Note that .mm is not allowed in cc_binary.
+    srcs = [
+        "src/butil/threading/platform_thread_mac.cc",
     ],
     deps = [
         "@com_github_gflags_gflags//:gflags",
@@ -320,7 +315,6 @@ objc_library(
         "//conditions:default": [],
     }),
     includes = ["src/"],
-    enable_modules = True,
     tags = ["manual"],
 )
 
