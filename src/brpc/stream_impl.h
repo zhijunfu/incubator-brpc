@@ -60,7 +60,7 @@ public:
                     const timespec *due_time);
     int Wait(const timespec* due_time);
     void FillSettings(StreamSettings *settings);
-    static int SetFailed(StreamId id, bool is_intentional = false);
+    static int SetFailed(StreamId id);
     void Close();
 
 private:
@@ -124,13 +124,6 @@ friend class MessageBatcher;
     butil::IOBuf *_pending_buf;
     int64_t _start_idle_timer_us;
     bthread_timer_t _idle_timer;
-
-    // NOTE(zhijunfu): This flag indicates whether this stream is intentionally
-    // closed by `StreamClose()`. If it is, then it's possible that the handler
-    // passed in _options has been destroyed, thus it's not safe to invoke its
-    // `on_closed()` function. It will also be set to true if the stream is
-    // recycled.
-    std::atomic<bool> _intentional_closed;
 };
 
 } // namespace brpc
