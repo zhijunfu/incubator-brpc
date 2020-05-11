@@ -53,6 +53,7 @@ struct StreamOptions {
         , idle_timeout_ms(-1)
         , messages_in_batch(128)
         , handler(NULL)
+        , handler_owned_by_brpc(false)
     {}
 
     // The max size of unconsumed data allowed at remote side. 
@@ -74,6 +75,11 @@ struct StreamOptions {
     // write any message, who will get EBADF on writting
     // default: NULL
     StreamInputHandler* handler;
+
+    // Whether the handler is owned by brpc. If this is true, then brpc is
+    // responsible for deleting the handler when the stream is destroyed.
+    // default: false
+    bool handler_owned_by_brpc;
 };
 
 // [Called at the client side]

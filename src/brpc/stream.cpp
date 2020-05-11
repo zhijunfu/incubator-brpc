@@ -57,6 +57,13 @@ Stream::Stream()
 }
 
 Stream::~Stream() {
+    // NOTE(zhijunfu): delete the reply handler if it's marked owned by us.
+    if (_options.handler != nullptr) {
+      if (_options.handler_owned_by_brpc) {
+        delete _options.handler;
+        _options.handler = nullptr;
+      }
+    }
     CHECK(_host_socket == NULL);
     bthread_mutex_destroy(&_connect_mutex);
     bthread_mutex_destroy(&_congestion_control_mutex);
