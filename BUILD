@@ -351,6 +351,7 @@ cc_library(
         "//conditions:default": [],
     }),
     linkopts = LINKOPTS,
+    linkstatic = True,
     visibility = ["//visibility:public"],
 )
 
@@ -385,6 +386,7 @@ cc_library(
         "//conditions:default": [],
     }),
     linkopts = LINKOPTS,
+    linkstatic = True,
     visibility = ["//visibility:public"],
 )
 
@@ -406,6 +408,7 @@ cc_library(
     ],
     copts = COPTS,
     linkopts = LINKOPTS,
+    linkstatic = True,
     visibility = ["//visibility:public"],
 )
 
@@ -511,6 +514,7 @@ cc_library(
     ],
     copts = COPTS,
     linkopts = LINKOPTS,
+    linkstatic = True,
     visibility = ["//visibility:public"],
 )
 
