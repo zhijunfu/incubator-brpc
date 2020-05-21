@@ -65,3 +65,9 @@ http_archive(
     strip_prefix = "googletest-0fe96607d85cf3a25ac40da369db62bbee2939a5",
     url = "https://github.com/google/googletest/archive/0fe96607d85cf3a25ac40da369db62bbee2939a5.tar.gz",
 )
+
+new_local_repository(
+     name = "systemssl",
+     path = "/usr/local/opt/openssl",
+     build_file = "systemssl.BUILD",
+)

@@ -79,8 +79,6 @@ LINKOPTS = [
     "-lpthread",
     "-ldl",
     "-lz",
-    "-lssl",
-    "-lcrypto",
 ] + select({
     ":darwin": [
         "-framework CoreFoundation",
@@ -96,6 +94,8 @@ LINKOPTS = [
     ],
     "//conditions:default": [
       "-lrt",
+      "-lssl",
+      "-lcrypto",
     ],
 }) + select({
     ":with_mesalink": [
@@ -337,7 +337,10 @@ cc_library(
         "@com_github_gflags_gflags//:gflags",
     ] + select({
         ":with_glog": ["@com_github_google_glog//:glog"],
-        ":darwin": [":macos_lib"],
+        ":darwin": [
+            ":macos_lib",
+            "@systemssl//:openssl",
+        ],
         "//conditions:default": [],
     }),
     includes = [
