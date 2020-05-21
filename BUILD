@@ -532,3 +532,28 @@ cc_binary(
     visibility = ["//visibility:public"],
 )
 
+proto_library(
+    name = "rpc_view_proto",
+    srcs = [
+        "tools/rpc_view/view.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "cc_rpc_view_proto",
+    deps = [
+        ":rpc_view_proto",
+    ],
+)
+
+cc_binary(
+    name = "rpc_view",
+    srcs = ["tools/rpc_view/rpc_view.cpp"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    visibility = ["//visibility:public"],
+    deps = [
+        ":cc_rpc_view_proto",
+        ":brpc",
+    ],
+)
