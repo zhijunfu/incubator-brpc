@@ -42,9 +42,9 @@ struct ProfilerLinker {
         cpu_profiler_enabled = true;
         // compiler has no way to tell if PROFILER_LINKER_DUMMY is 0 or not,
         // so it has to link the function inside the branch.
-        if (PROFILER_LINKER_DUMMY != 0/*must be false*/) {
-            ProfilerStart("this_function_should_never_run");
-        }
+        // if (PROFILER_LINKER_DUMMY != 0/*must be false*/) {
+        //     ProfilerStart("this_function_should_never_run");
+        //}
 #endif
     }
 };

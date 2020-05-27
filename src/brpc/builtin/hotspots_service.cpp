@@ -501,6 +501,7 @@ static void DisplayResult(Controller* cntl,
 #endif
 
     const std::string cmd = cmd_builder.str();
+    LOG(INFO) << "executing profiling command: " << cmd;
     for (int ntry = 0; ntry < 2; ++ntry) {
         if (!g_written_pprof_perl) {
             if (!WriteSmallFile(pprof_tool.c_str(), pprof_perl()) ||
