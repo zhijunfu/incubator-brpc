@@ -398,6 +398,7 @@ Server::Server(ProfilerLinker)
 }
 
 Server::~Server() {
+    RPC_VLOG << "Server::~Server()";
     Stop(0);
     Join();
     ClearServices();
@@ -1689,6 +1690,7 @@ void Server::RunUntilAskedToQuit() {
     while (!IsAskedToQuit()) {
         bthread_usleep(1000000L);
     }
+    RPC_VLOG << "exits the loop in RunUntilAskedToQuit";
     Stop(0/*not used now*/);
     Join();
 }

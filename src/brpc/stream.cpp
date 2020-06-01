@@ -563,6 +563,14 @@ int Stream::SetHostSocket(Socket *host_socket) {
         return -1;
     }
     _host_socket = ptr.release();
+    // NOTE(zhijunfu): Set this so that SetFailed() will be called when server shutdown,
+    // to make sure that references are properly cleared, this is a must for streaming
+    // connections, otherwise the server might block forever in Acceptor::Join().
+    // For more details see the comments in Acceptor::StopAccept().
+    // To verify if this works, start `streaming_echo_c++_server` in the example
+    // and then `streaming_echo_c++_client`, and then press Ctrl-C on the server
+    // and see if it terminates immediately without pressing Ctrl-C on the client.
+    _host_socket->fail_me_at_server_stop();
     return 0;
 }
 

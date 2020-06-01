@@ -22,7 +22,7 @@
 #include "butil/fd_utility.h"               // make_close_on_exec
 #include "butil/time.h"                     // gettimeofday_us
 #include "brpc/acceptor.h"
-
+#include "brpc/log.h"
 
 namespace brpc {
 
@@ -112,7 +112,7 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
     // Currently `closewait_ms' is useless since we have to wait until 
     // existing requests are finished. Otherwise, contexts depended by 
     // the requests may be deleted and invalid.
-
+    RPC_VLOG << "Acceptor::StopAccept() is called";
     {
         BAIDU_SCOPED_LOCK(_map_mutex);
         if (_status != RUNNING) {
@@ -121,6 +121,7 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
         _status = STOPPING;
     }
 
+    RPC_VLOG << "SetFailed for _acception_id " << _acception_id;
     // Don't set _acception_id to 0 because BeforeRecycle needs it.
     Socket::SetFailed(_acception_id);
 
@@ -129,6 +130,7 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
     std::vector<SocketId> erasing_ids;
     ListConnections(&erasing_ids);
     
+    RPC_VLOG << "SetFailed for all existing connections";
     for (size_t i = 0; i < erasing_ids.size(); ++i) {
         SocketUniquePtr socket;
         if (Socket::Address(erasing_ids[i], &socket) == 0) {
@@ -138,14 +140,20 @@ void Acceptor::StopAccept(int /*closewait_ms*/) {
                 // otherwise the sockets are often referenced by corresponding
                 // objects and delay server's stopping which requires all
                 // existing sockets to be recycled.
+                RPC_VLOG << "SetFailed() is called for socket " << erasing_ids[i];
                 socket->SetFailed(ELOGOFF, "Server is stopping");
             } else {
                 // Message-oriented RPC connections. Just release the addtional
                 // reference in the socket, which will be recycled when current
                 // requests have been processed.
+                RPC_VLOG << "ReleaseAdditionalReference() is called for socket " << erasing_ids[i];
+                // socket->SetFailed(ELOGOFF, "Server is stopping");
                 socket->ReleaseAdditionalReference();
             }
         } // else: This socket already called `SetFailed' before
+        else {
+            RPC_VLOG << "SetFailed() has already been called previous for socket " << erasing_ids[i];
+        }
     }
 }
 
@@ -160,6 +168,7 @@ int Acceptor::Initialize() {
 
 // NOTE: Join() can happen before StopAccept()
 void Acceptor::Join() {
+    RPC_VLOG << "Acceptor::Join() is called";
     std::unique_lock<butil::Mutex> mu(_map_mutex);
     if (_status != STOPPING && _status != RUNNING) {  // no need to join.
         return;
@@ -332,6 +341,7 @@ void Acceptor::BeforeRecycle(Socket* sock) {
         _empty_cond.Broadcast();
         return;
     }
+    RPC_VLOG << "BeforeRecycle() is called for socket " << sock->id();
     // If a Socket could not be addressed shortly after its creation, it
     // was not added into `_socket_map'.
     _socket_map.erase(sock->id());
