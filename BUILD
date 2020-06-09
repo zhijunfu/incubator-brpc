@@ -20,12 +20,6 @@ exports_files(["LICENSE"])
 load(":bazel/brpc.bzl", "brpc_proto_library")
 
 config_setting(
-    name = "with_glog",
-    define_values = {"with_glog": "true"},
-    visibility = ["//visibility:public"],
-)
-
-config_setting(
     name = "with_mesalink",
     define_values = {"with_mesalink": "true"},
     visibility = ["//visibility:public"],
@@ -64,10 +58,8 @@ COPTS = [
     "-D__STDC_LIMIT_MACROS",
     "-D__STDC_CONSTANT_MACROS",
     "-DGFLAGS_NS=google",
+] + ["-DBRPC_WITH_GLOG=1",
 ] + select({
-    ":with_glog": ["-DBRPC_WITH_GLOG=1"],
-    "//conditions:default": ["-DBRPC_WITH_GLOG=0"],
-}) + select({
     ":with_mesalink": ["-DUSE_MESALINK"],
     "//conditions:default": [""],
 }) + select({
@@ -123,10 +115,9 @@ genrule(
 #ifdef BRPC_WITH_GLOG
 #undef BRPC_WITH_GLOG
 #endif
-#define BRPC_WITH_GLOG """ + select({
-    ":with_glog": "1",
-    "//conditions:default": "0",
-}) +
+#define BRPC_WITH_GLOG """ + 
+    "1"
+ +
 """
 #endif  // BUTIL_CONFIG_H
 EOF
@@ -310,10 +301,8 @@ cc_library(
     ],
     deps = [
         "@com_github_gflags_gflags//:gflags",
-    ] + select({
-        ":with_glog": ["@com_github_google_glog//:glog"],
-        "//conditions:default": [],
-    }),
+    ] + ["@com_github_google_glog//:glog",
+    ],
     includes = ["src/"],
     tags = ["manual"],
 )
@@ -336,12 +325,11 @@ cc_library(
         "@com_google_protobuf//:protobuf",
         "@com_github_gflags_gflags//:gflags",
     ] + select({
-        ":with_glog": ["@com_github_google_glog//:glog"],
         ":darwin": [
             ":macos_lib",
             "@systemssl//:openssl",
         ],
-        "//conditions:default": [],
+        "//conditions:default": ["@com_github_google_glog//:glog"],
     }),
     includes = [
         "src/",
