@@ -1742,7 +1742,7 @@ void Server::PrintTabsBody(std::ostream& os,
 static pthread_mutex_t g_dummy_server_mutex = PTHREAD_MUTEX_INITIALIZER;
 static Server* g_dummy_server = NULL;
 
-int StartDummyServerAt(int port, ProfilerLinker) {
+int StartDummyServerAt(int port, int *actual_port, ProfilerLinker) {
     if (port < 0 || port >= 65536) {
         LOG(ERROR) << "Invalid port=" << port;
         return -1;
@@ -1763,6 +1763,9 @@ int StartDummyServerAt(int port, ProfilerLinker) {
             // fencing, but we only expose a function to test existence
             // of g_dummy_server, everything should be fine.
             g_dummy_server = dummy_server;
+            if (actual_port != nullptr) {
+                *actual_port = g_dummy_server->listen_address().port;
+            }
             return 0;
         }
     }

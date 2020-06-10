@@ -160,6 +160,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
     if (pipe == NULL) {
         return -1;
     }
+    bool read_finished = false;
     char buffer[1024];
     for (;;) {
         size_t nr = fread(buffer, 1, sizeof(buffer), pipe);
@@ -168,6 +169,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
         }
         if (nr != sizeof(buffer)) {
             if (feof(pipe)) {
+                read_finished = true;
                 break;
             } else if (ferror(pipe)) {
                 LOG(ERROR) << "Encountered error while reading for the pipe";
@@ -178,8 +180,17 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
     }
 
     const int wstatus = pclose(pipe);
-
     if (wstatus < 0) {
+        if (read_finished) {
+            // pclose() would fail if SIGCHLD is ignored, so if fread() finished successfully
+            // in this case, we check if SIGCHLD is ignored, and treat it as success in this case.
+            struct sigaction act;
+            if (!sigaction(SIGCHLD, NULL, &act) && act.sa_handler == SIG_IGN) {
+                LOG(INFO) << "Ignoring pclose() failure because SIGCHLD is ignored and fread() succeeds,"
+                          << ", cmd: " << cmd;
+                return 0;
+            }
+        }
         return wstatus;
     }
     if (WIFEXITED(wstatus)) {
@@ -189,6 +200,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
         os << "Child process was killed by signal "
            << WTERMSIG(wstatus);
     }
+    LOG(INFO) << "Command failured with ECHILD, cmd: " << cmd;
     errno = ECHILD;
     return -1;
 }

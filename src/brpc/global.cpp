@@ -245,7 +245,7 @@ static void* GlobalUpdate(void*) {
             && fw.check_and_consume() > 0) {
             long port = ReadPortOfDummyServer(DUMMY_SERVER_PORT_FILE);
             if (port >= 0) {
-                StartDummyServerAt(port);
+                StartDummyServerAt(port, nullptr);
             }
         }
 

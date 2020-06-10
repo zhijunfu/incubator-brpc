@@ -693,11 +693,14 @@ void* thread_local_data();
 bool IsDummyServerRunning();
 
 // Start a dummy server listening at `port'. If a dummy server was already
-// running, this function does nothing and fails.
+// running, this function does nothing and fails. If this function succeeds
+// and `actual_port` is not NULL, set its value as the actual port for the
+// server, this is useful when this function is called with `port` set to 0,
+// in this case OS will assign a port for the server.
 // NOTE: The second parameter(ProfilerLinker) is for linking of profiling 
 // functions when corresponding macros are defined, just ignore it.
 // Returns 0 on success, -1 otherwise.
-int StartDummyServerAt(int port, ProfilerLinker = ProfilerLinker());
+int StartDummyServerAt(int port, int *actual_port, ProfilerLinker = ProfilerLinker());
 
 } // namespace brpc
 
