@@ -182,6 +182,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
     const int wstatus = pclose(pipe);
     if (wstatus < 0) {
         if (read_finished) {
+#if defined(OS_LINUX)
             // pclose() would fail if SIGCHLD is ignored, so if fread() finished successfully
             // in this case, we check if SIGCHLD is ignored, and treat it as success in this case.
             struct sigaction act;
@@ -190,6 +191,7 @@ int read_command_output_through_popen(std::ostream& os, const char* cmd) {
                           << ", cmd: " << cmd;
                 return 0;
             }
+#endif
         }
         return wstatus;
     }
